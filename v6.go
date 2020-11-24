@@ -31,6 +31,12 @@ type Script = lib.Script
 
 type ScriptQuery = lib.ScriptQuery
 
+type BulkIndexRequest = lib.BulkIndexRequest
+
+type BulkUpdateRequest = lib.BulkUpdateRequest
+
+type BulkDeleteRequest = lib.BulkDeleteRequest
+
 type BulkResponse = lib.BulkResponse
 
 type BulkResponseItem = lib.BulkResponseItem

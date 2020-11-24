@@ -9,18 +9,23 @@ import (
 
 type CreateIndexBodyFunc func() (string, error)
 
+func CreateIndex(ctx context.Context, client *Client, index string, bodyFn CreateIndexBodyFunc) (err error) {
+	var body string
+	body, err = bodyFn()
+	if err != nil {
+		return
+	}
+	err = createIndex(ctx, client, index, body)
+	return
+}
+
 func CreateIndexIfNotExists(ctx context.Context, client *Client, index string, bodyFn CreateIndexBodyFunc) (err error) {
 	exists, err := client.IndexExists(index).Do(ctx)
 	if err != nil {
 		return
 	}
 	if !exists {
-		var body string
-		body, err = bodyFn()
-		if err != nil {
-			return
-		}
-		err = createIndex(ctx, client, index, body)
+		err = CreateIndex(ctx, client, index, bodyFn)
 	}
 	return
 }
