@@ -31,6 +31,10 @@ type Script = lib.Script
 
 type ScriptQuery = lib.ScriptQuery
 
+type PrefixQuery = lib.PrefixQuery
+
+type GeoBoundingBoxQuery = lib.GeoBoundingBoxQuery
+
 type IndicesCreateResult = lib.IndicesCreateResult
 
 type IndicesDeleteResponse = lib.IndicesDeleteResponse
@@ -77,6 +81,14 @@ func NewScript(script string) *lib.Script {
 
 func NewScriptQuery(script *lib.Script) *lib.ScriptQuery {
 	return lib.NewScriptQuery(script)
+}
+
+func NewPrefixQuery(name string, prefix string) *lib.PrefixQuery {
+	return lib.NewPrefixQuery(name, prefix)
+}
+
+func NewGeoBoundingBoxQuery(name string) *lib.GeoBoundingBoxQuery {
+	return lib.NewGeoBoundingBoxQuery(name)
 }
 
 func NewBulkIndexRequest() *lib.BulkIndexRequest {
