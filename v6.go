@@ -1,3 +1,4 @@
+//go:build es6
 // +build es6
 
 package elastic
@@ -10,7 +11,6 @@ import (
 	"time"
 
 	lib "github.com/olivere/elastic"
-	"github.com/paulmach/orb/geojson"
 )
 
 type Error = lib.Error
@@ -24,6 +24,8 @@ type BoolQuery = lib.BoolQuery
 type TermQuery = lib.TermQuery
 
 type TermsQuery = lib.TermsQuery
+
+type MatchQuery = lib.MatchQuery
 
 type RangeQuery = lib.RangeQuery
 
@@ -69,6 +71,10 @@ func NewTermQuery(name string, value interface{}) *lib.TermQuery {
 
 func NewTermsQuery(name string, values ...interface{}) *lib.TermsQuery {
 	return lib.NewTermsQuery(name, values)
+}
+
+func NewMatchQuery(name string, text interface{}) *lib.MatchQuery {
+	return lib.NewMatchQuery(name, text)
 }
 
 func NewRangeQuery(name string) *lib.RangeQuery {
@@ -137,15 +143,6 @@ func PutMapping(ctx context.Context, client *Client, index string, mapping map[s
 func GetMapping(ctx context.Context, client *Client, index string) (mapping map[string]interface{}, err error) {
 	mapping, err = client.GetMapping().Index(index).IncludeTypeName(false).Do(ctx)
 	return
-}
-
-func SearchHitToFeature(hit *lib.SearchHit, sourceMapToFeature SourceMapToFeature) (*geojson.Feature, error) {
-	var sourceMap map[string]interface{}
-	err := json.Unmarshal(*hit.Source, &sourceMap)
-	if err != nil {
-		return nil, err
-	}
-	return sourceMapToFeature(hit.Id, sourceMap)
 }
 
 func UnmarshalGetResult(result *lib.GetResult, v interface{}) (err error) {

@@ -2,9 +2,6 @@ package elastic
 
 import (
 	"context"
-
-	"github.com/paulmach/orb"
-	"github.com/paulmach/orb/geojson"
 )
 
 type CreateIndexBodyFunc func() (string, error)
@@ -42,12 +39,11 @@ func DeleteIndexIfExists(ctx context.Context, client *Client, index string) (err
 	return
 }
 
-type SourceMapToFeature func(id string, sourceMap map[string]interface{}) (*geojson.Feature, error)
-
 type EnvelopeQuery struct {
-	name     string
-	bound    orb.Bound
-	relation string
+	name       string
+	relation   string
+	upperLeft  []float64
+	lowerRight []float64
 }
 
 func (q *EnvelopeQuery) Source() (interface{}, error) {
@@ -64,7 +60,7 @@ func (q *EnvelopeQuery) Source() (interface{}, error) {
 	// https://www.elastic.co/guide/en/elasticsearch/reference/6.2/geo-shape.html#_envelope
 	shape := make(map[string]interface{})
 	shape["type"] = "envelope"
-	shape["coordinates"] = []orb.Point{q.bound.LeftTop(), q.bound.RightBottom()}
+	shape["coordinates"] = [][]float64{q.upperLeft, q.lowerRight}
 
 	params["shape"] = shape
 	params["relation"] = q.relation
@@ -84,10 +80,11 @@ func (q *EnvelopeQuery) Source() (interface{}, error) {
 	return source, nil
 }
 
-func GeoIntersectionQuery(name string, bound orb.Bound) Query {
+func GeoIntersectionQuery(name string, upperLeft []float64, lowerRight []float64) Query {
 	return &EnvelopeQuery{
-		name:     name,
-		bound:    bound,
-		relation: "intersects",
+		name:       name,
+		relation:   "intersects",
+		upperLeft:  upperLeft,
+		lowerRight: lowerRight,
 	}
 }
